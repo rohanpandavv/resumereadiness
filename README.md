@@ -20,6 +20,7 @@ An AI-powered web application that analyzes your resume and provides actionable 
 - **💾 Downloadable Reports**: Export your analysis results for future reference
 - **📈 Usage Statistics**: Track token usage and analysis metrics
 - **🔒 Secure Processing**: Local file processing with API-based analysis
+- **⚡️ Lightweight Model**: Using `gpt-4o-mini` to keep the analysis cost efficient
 
 ## 🚀 Quick Start
 
