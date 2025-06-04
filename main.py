@@ -6,14 +6,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Set page config with file upload limit
 st.set_page_config(
     page_title="Resume Readiness Checker", 
     page_icon="💼", 
     layout="centered"
 )
 
-# Set maximum file upload size to 5MB
 st.config.set_option('server.maxUploadSize', 5)
 
 st.title("Resume Readiness Checker")
@@ -21,20 +19,38 @@ st.markdown("""
 Upload your resume and get AI-powered feedback to improve your job application success.
 """)
 
-# Check for OpenAI API key
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-if not OPENAI_API_KEY:
-    st.error("⚠️ OpenAI API key not found. Please add OPENAI_API_KEY to your .env file.")
-    st.stop()
 
-# File upload with size limit
+if not OPENAI_API_KEY:
+    st.info("🔑 OpenAI API key not found in environment variables. Please enter your API key below:")
+    OPENAI_API_KEY = st.text_input(
+        "Enter your OpenAI API Key",
+        type="password",
+        help="Your API key will be used only for this session and not stored anywhere.",
+        placeholder="sk-..."
+    )
+    
+    if not OPENAI_API_KEY:
+        st.warning("⚠️ Please enter your OpenAI API key to use the resume analyzer.")
+        st.markdown("""
+        **How to get your OpenAI API Key:**
+        1. Go to [OpenAI Platform](https://platform.openai.com/api-keys)
+        2. Sign in to your account
+        3. Click "Create new secret key"
+        4. Copy and paste the key above
+        
+        💡 **Your API key is secure** - it's only used for this session and never stored.
+        """)
+        st.stop()
+else:
+    st.success("✅ OpenAI API key loaded from environment variables.")
+
 file = st.file_uploader(
     "Upload your resume (PDF format only)", 
     type=["pdf"],
     help="Maximum file size: 5MB"
 )
 
-# Input fields
 job_role = st.text_input(
     "Enter the job role you're applying for (optional)",
     placeholder="e.g., Software Engineer, Data Scientist, Product Manager"
@@ -72,10 +88,9 @@ def extract_text_from_file(uploaded_file):
         st.error("Unsupported file type. Please upload a PDF file.")
         return None
 
-def analyze_resume_with_ai(file_content, job_role, job_description):
+def analyze_resume_with_ai(file_content, job_role, job_description, api_key):
     """Analyze resume using OpenAI API."""
     try:
-        # Build context-aware prompt
         context = ""
         if job_role:
             context += f"Target Job Role: {job_role}\n"
@@ -100,7 +115,7 @@ def analyze_resume_with_ai(file_content, job_role, job_description):
 
         Please provide your analysis in a clear, structured format with specific, actionable recommendations."""
 
-        client = OpenAI(api_key=OPENAI_API_KEY)
+        client = OpenAI(api_key=api_key)
         
         with st.spinner("🤖 AI is analyzing your resume..."):
             response = client.chat.completions.create(
@@ -122,17 +137,14 @@ def analyze_resume_with_ai(file_content, job_role, job_description):
         st.error(f"Error analyzing resume: {str(e)}")
         return None, None
 
-# Main analysis logic
 if analyze and file:
-    # Check file size (additional check)
-    file_size = len(file.getvalue()) / (1024 * 1024)  # Convert to MB
+    file_size = len(file.getvalue()) / (1024 * 1024)
     if file_size > 5:
         st.error("❌ File size exceeds 5MB limit. Please upload a smaller file.")
         st.stop()
     
     st.write("📄 Processing your resume...")
     
-    # Extract text from file
     file_content = extract_text_from_file(file)
     
     if not file_content:
@@ -143,18 +155,15 @@ if analyze and file:
         st.error("❌ The file appears to be empty or contains no readable text.")
         st.stop()
     
-    # Show extracted text preview (optional)
     with st.expander("📝 View Extracted Text (Preview)"):
         st.text_area("Extracted Content", file_content[:1000] + "..." if len(file_content) > 1000 else file_content, height=200)
     
-    # Analyze with AI
-    analysis_result, usage_info = analyze_resume_with_ai(file_content, job_role, job_description)
+    analysis_result, usage_info = analyze_resume_with_ai(file_content, job_role, job_description, OPENAI_API_KEY)
     
     if analysis_result:
         st.markdown("## 📊 Resume Analysis Results")
         st.markdown(analysis_result)
         
-        # Optional: Show usage statistics in an expander
         if usage_info:
             with st.expander("📈 Analysis Statistics"):
                 col1, col2, col3 = st.columns(3)
@@ -165,7 +174,6 @@ if analyze and file:
                 with col3:
                     st.metric("Response Tokens", usage_info.completion_tokens)
         
-        # Add download option for feedback
         st.download_button(
             label="💾 Download Analysis",
             data=analysis_result,
@@ -179,7 +187,6 @@ elif analyze and not file:
 else:
     st.info("👆 Upload your resume above to get started with AI-powered feedback!")
 
-# Add footer with tips
 st.markdown("---")
 st.markdown("""
 ### 💡 Tips for Better Results:
@@ -187,4 +194,9 @@ st.markdown("""
 - **Provide job role and description** for targeted feedback
 - **Include quantifiable achievements** in your resume
 - **Keep file size under 5MB** for faster processing
+
+### 🔑 API Key Options:
+- **Environment Variable**: Set `OPENAI_API_KEY` in your `.env` file for automatic loading
+- **Manual Input**: Enter your API key directly in the interface above
+- **Security**: Your API key is only used for this session and never stored permanently
 """)
