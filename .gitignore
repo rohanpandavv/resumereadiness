@@ -1,0 +1,20 @@
+# Virtual environment
+/venv/
+venv/
+.venv
+
+# Cache folders
+/cache/
+cache/
+
+# Data files (if they are not needed in the repository)
+data/
+
+# Other temporary files and logs
+*.pyc
+*.log
+*.tmp
+*.cache
+
+# Environment configuration files
+.env
