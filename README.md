@@ -33,8 +33,8 @@ An AI-powered web application that analyzes your resume and provides actionable 
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/rohanpandavv/resumereadyness.git
-   cd resumereadyness
+   git clone https://github.com/rohanpandavv/resumereadiness.git
+   cd resumereadiness
    ```
 
 2. **Set up virtual environment (recommended)**
@@ -140,7 +140,7 @@ The analysis provides structured feedback including:
 ### Project Structure
 
 ```
-resumereadyness/
+resumereadiness/
 ├── main.py              # Main Streamlit application
 ├── pyproject.toml       # Project configuration and dependencies
 ├── uv.lock             # Dependency lock file
@@ -207,7 +207,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 If you encounter any issues:
 1. Check the troubleshooting section above
-2. Review the [Issues](https://github.com/yourusername/resumereadyness/issues) page
+2. Review the [Issues](https://github.com/yourusername/resumereadiness/issues) page
 3. Create a new issue with detailed description
 
 ## 🙏 Acknowledgments
